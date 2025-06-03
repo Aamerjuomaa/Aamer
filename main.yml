@@ -1,9 +1,30 @@
-name: CI Pipeline
-on: [push] 
+name: C++ CI
+
+on: [push, pull_request]  # يُنفَّذ عند push أو pull request
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build-and-test:
+    runs-on: ubuntu-latest  # أو windows-latest / macos-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Run a script
-        run: echo "Hello, GitHub Actions!"
+      - uses: actions/checkout@v4  # تحميل الكود
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++ cmake make
+
+      - name: Create build directory
+        run: mkdir -p build
+
+      - name: Configure CMake
+        working-directory: ./build
+        run: cmake ..
+
+      - name: Build
+        working-directory: ./build
+        run: cmake --build .
+
+      - name: Run tests
+        working-directory: ./build
+        run: ctest  # إذا كنت تستخدم CMake مع اختبارات (اختياري)
